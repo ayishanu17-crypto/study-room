@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { User, StudyRoom } from './types';
-import { auth, googleProvider, signInWithPopup, signOut } from './services/firebase';
+import { useState, useEffect } from 'react';
+import { type User, type StudyRoom } from './types';
+import { auth, googleProvider, signInWithPopup } from './services/firebase';
 import RoomDashboard from './components/RoomDashboard';
 import RoomWorkspace from './components/RoomWorkspace';
 import { LogIn } from 'lucide-react';

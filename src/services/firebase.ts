@@ -3,12 +3,13 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAxruvpiOrP__A-MXRBc7zsXfMItJjJOwk",
+  authDomain: "study-room-app-308e5.firebaseapp.com",
+  projectId: "study-room-app-308e5",
+  storageBucket: "study-room-app-308e5.firebasestorage.app",
+  messagingSenderId: "179573038368",
+  appId: "1:179573038368:web:324c49fc9d32b3eb974b45",
+  measurementId: "G-9V3NK58L7L"
 };
 
 const app = initializeApp(firebaseConfig);
