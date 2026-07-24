@@ -79,9 +79,6 @@ export default function RoomWorkspace({ room, user, onLeave, initialTab = 'white
       if (!isVideoOn) {
         setCameraError('');
         setCameraStream(null);
-        if (videoRef.current) {
-          videoRef.current.srcObject = null;
-        }
         return;
       }
 
@@ -94,11 +91,6 @@ export default function RoomWorkspace({ room, user, onLeave, initialTab = 'white
 
         setCameraStream(activeStream);
         setCameraError('');
-
-        if (videoRef.current) {
-          videoRef.current.srcObject = activeStream;
-          void videoRef.current.play().catch(() => undefined);
-        }
       } catch (error) {
         console.error('Camera access failed:', error);
         setCameraError('Camera access was blocked. Allow camera permission to enable your preview.');
@@ -113,11 +105,26 @@ export default function RoomWorkspace({ room, user, onLeave, initialTab = 'white
       if (activeStream) {
         activeStream.getTracks().forEach((track) => track.stop());
       }
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
-      }
     };
   }, [isVideoOn]);
+
+  useEffect(() => {
+    const currentVideo = videoRef.current;
+    if (currentVideo) {
+      currentVideo.srcObject = cameraStream;
+      if (cameraStream) {
+        currentVideo.play().catch((err) => {
+          console.warn('Video play interrupted:', err);
+        });
+      }
+    }
+
+    return () => {
+      if (currentVideo) {
+        currentVideo.srcObject = null;
+      }
+    };
+  }, [cameraStream]);
 
   const flashcards = [
     {
