@@ -14,6 +14,7 @@ import { fetchRooms, createRoom } from './services/studyService';
 import RoomWorkspace from './components/RoomWorkspace';
 import StudyHubDashboard from './components/StudyHubDashboard';
 import ProfileSettings from './components/ProfileSettings';
+import ExploreRooms from './components/ExploreRooms';
 import {
   LogIn,
   LogOut,
@@ -39,9 +40,10 @@ export default function App() {
   const [rooms, setRooms] = useState<StudyRoom[]>([]);
   const [newRoomName, setNewRoomName] = useState('');
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'explore' | 'create'>('explore');
+const [activeTab, setActiveTab] = useState<'explore' | 'create'>('explore');
   const [currentView, setCurrentView] = useState<'home' | 'how-it-works' | 'rules'>('home');
   const [showStudyHub, setShowStudyHub] = useState(false);
+  const [showExploreRooms, setShowExploreRooms] = useState(false);
   const [showProfileSettings, setShowProfileSettings] = useState(false);
   const [showConversations, setShowConversations] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -145,11 +147,12 @@ export default function App() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-    } catch (error) {
+} catch (error) {
       console.error('Logout failed:', error);
     } finally {
       setCurrentRoom(null);
       setShowStudyHub(false);
+      setShowExploreRooms(false);
       setShowProfileSettings(false);
       setShowConversations(false);
       setShowLeaderboard(false);
@@ -157,10 +160,11 @@ export default function App() {
     }
   };
 
-  const openRoom = async (room: StudyRoom, tab: RoomTab = 'whiteboard') => {
+const openRoom = async (room: StudyRoom, tab: RoomTab = 'whiteboard') => {
     setCurrentRoom(room);
     setRoomTab(tab);
     setShowStudyHub(false);
+    setShowExploreRooms(false);
     setShowProfileSettings(false);
     setShowConversations(false);
     setShowLeaderboard(false);
@@ -278,6 +282,22 @@ export default function App() {
           </div>
         </div>
       </div>
+    );
+  }
+
+if (showExploreRooms) {
+    return (
+      <ExploreRooms
+        user={user}
+        rooms={rooms}
+        onSelectRoom={(room) => {
+          if (user) {
+            void openRoom(room, 'whiteboard');
+          }
+        }}
+        onBack={() => setShowExploreRooms(false)}
+        onSignIn={() => setShowAuth(true)}
+      />
     );
   }
 
@@ -419,8 +439,8 @@ export default function App() {
             >
               <Plus size={16} /> Start a room
             </button>
-            <button
-              onClick={() => setActiveTab('explore')}
+<button
+              onClick={() => setShowExploreRooms(true)}
               className={`flex items-center gap-2 rounded-2xl border px-5 py-3 text-sm font-semibold transition ${isDark ? 'border-slate-700 bg-slate-800/70 text-slate-200 hover:border-indigo-400/40 hover:text-white' : 'border-slate-300 bg-white/90 text-slate-700 hover:border-indigo-400/40 hover:text-slate-900'}`}
             >
               <Compass size={16} /> Explore rooms
@@ -446,12 +466,20 @@ export default function App() {
         <div className={`rounded-[28px] border p-6 shadow-inner ${softPanelClass} ${isDark ? 'shadow-black/20' : 'shadow-slate-200/60'}`}>
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-sm font-semibold text-indigo-400">Live room preview</div>
+<div className="text-sm font-semibold text-indigo-400">Live room preview</div>
               <div className={`mt-1 text-xl font-semibold ${headingTextClass}`}>Tonight's deep work sprint</div>
             </div>
             <div className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-sm font-medium text-emerald-300">
               Live
             </div>
+          </div>
+
+<div className="mt-5 overflow-hidden rounded-2xl border border-white/10 bg-slate-800">
+            <img
+              src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=800&q=80"
+              alt="Study room preview"
+              className="h-44 w-full object-cover transition-transform duration-500 hover:scale-105"
+            />
           </div>
 
           <div className="mt-6 space-y-3">
@@ -549,9 +577,9 @@ export default function App() {
             </div>
           </div>
 
-          <div className={`mt-5 flex items-center gap-2 rounded-2xl border p-1.5 ${isDark ? 'border-slate-800 bg-slate-950/60' : 'border-slate-200 bg-white/90'}`}>
+<div className={`mt-5 flex items-center gap-2 rounded-2xl border p-1.5 ${isDark ? 'border-slate-800 bg-slate-950/60' : 'border-slate-200 bg-white/90'}`}>
             <button
-              onClick={() => setActiveTab('explore')}
+              onClick={() => setShowExploreRooms(true)}
               className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${activeTab === 'explore' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20' : isDark ? 'text-slate-400 hover:text-slate-200' : 'text-slate-600 hover:text-slate-900'}`}
             >
               <Compass size={14} /> Explore rooms

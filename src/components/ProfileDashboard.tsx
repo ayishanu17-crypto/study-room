@@ -23,7 +23,7 @@ export default function ProfileDashboard({ user, rooms, onSelectRoom }: ProfileD
     .toUpperCase();
 
   return (
-    <div className="min-h-[calc(100vh-88px)] bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.12),_transparent_30%),linear-gradient(135deg,_#020617,_#0f172a_45%,_#111827)] px-4 py-6 text-slate-100 sm:px-6 lg:px-8">
+    <div className="min-h-[calc(100vh-88px)] bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.12),transparent_30%),linear-gradient(135deg,#020617,#0f172a_45%,#111827)] px-4 py-6 text-slate-100 sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-7xl gap-4">
         <aside className="hidden w-20 shrink-0 flex-col justify-between rounded-[28px] border border-white/10 bg-slate-900/80 p-3 shadow-2xl shadow-black/20 lg:flex">
           <div className="space-y-3">
@@ -49,10 +49,10 @@ export default function ProfileDashboard({ user, rooms, onSelectRoom }: ProfileD
           </div>
         </aside>
 
-        <section className="flex-1 rounded-[32px] border border-white/10 bg-slate-900/75 p-6 shadow-2xl shadow-black/20 backdrop-blur-xl">
+        <section className="flex-1 rounded-4xl border border-white/10 bg-slate-900/75 p-6 shadow-2xl shadow-black/20 backdrop-blur-xl">
           <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:justify-between">
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 via-violet-500 to-cyan-400 text-xl font-semibold text-white">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-500 via-violet-500 to-cyan-400 text-xl font-semibold text-white">
                 {user.photoURL ? (
                   <img src={user.photoURL} alt={user.displayName} className="h-16 w-16 rounded-2xl object-cover" />
                 ) : (
@@ -74,9 +74,31 @@ export default function ProfileDashboard({ user, rooms, onSelectRoom }: ProfileD
             </div>
           </div>
 
-          <div className="mt-6 grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+          {/* --- RANDOM LIVE WORKSPACE IMAGE CARD --- */}
+          <div className="mt-6 mb-6 overflow-hidden rounded-3xl border border-white/10 bg-slate-950/60 shadow-lg grid grid-cols-1 md:grid-cols-3">
+            <div className="h-48 md:h-auto overflow-hidden bg-slate-800">
+              <img 
+                src="https://picsum.photos/seed/studyroom/800/600" 
+                alt="Random workspace preview" 
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+              />
+            </div>
+            <div className="p-6 md:col-span-2 flex flex-col justify-center">
+              <div className="inline-flex items-center gap-2 self-start rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-indigo-300">
+                <Sparkles size={12} /> Active Sanctuary
+              </div>
+              <h3 className="mt-3 text-xl font-bold text-white sm:text-2xl">
+                Deep Focus & Real-Time Sync
+              </h3>
+              <p className="mt-2 text-sm text-slate-300 leading-relaxed">
+                Your rooms are optimized for low-latency collaboration, shared note-writing, and distraction-free learning environments.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
             <div className="space-y-4">
-              <div className="rounded-[24px] border border-white/10 bg-slate-950/60 p-4">
+              <div className="rounded-3xl border border-white/10 bg-slate-950/60 p-4">
                 <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.25em] text-indigo-300">
                   <Trophy size={16} /> Achievements
                 </div>
@@ -93,7 +115,7 @@ export default function ProfileDashboard({ user, rooms, onSelectRoom }: ProfileD
                 </div>
               </div>
 
-              <div className="rounded-[24px] border border-white/10 bg-slate-950/60 p-4">
+              <div className="rounded-3xl border border-white/10 bg-slate-950/60 p-4">
                 <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.25em] text-indigo-300">
                   <MessageSquare size={16} /> Conversations
                 </div>
@@ -113,7 +135,7 @@ export default function ProfileDashboard({ user, rooms, onSelectRoom }: ProfileD
             </div>
 
             <div className="space-y-4">
-              <div className="rounded-[24px] border border-white/10 bg-slate-950/60 p-4">
+              <div className="rounded-3xl border border-white/10 bg-slate-950/60 p-4">
                 <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.25em] text-indigo-300">
                   <DoorOpen size={16} /> Your rooms
                 </div>
@@ -142,7 +164,7 @@ export default function ProfileDashboard({ user, rooms, onSelectRoom }: ProfileD
                 </div>
               </div>
 
-              <div className="rounded-[24px] border border-white/10 bg-slate-950/60 p-4">
+              <div className="rounded-3xl border border-white/10 bg-slate-950/60 p-4">
                 <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.25em] text-indigo-300">
                   <BookOpen size={16} /> Study pulse
                 </div>
