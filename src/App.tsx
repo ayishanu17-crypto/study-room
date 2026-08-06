@@ -10,11 +10,12 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword
 } from './services/firebase';
-import { fetchRooms, createRoom } from './services/studyService';
+import { fetchRooms, createRoom, subscribeToRoomsByHost } from './services/studyService';
 import RoomWorkspace from './components/RoomWorkspace';
 import StudyHubDashboard from './components/StudyHubDashboard';
 import ProfileSettings from './components/ProfileSettings';
 import ExploreRooms from './components/ExploreRooms';
+import Leaderboard from './components/Leaderboard';
 import {
   LogIn,
   LogOut,
@@ -37,7 +38,8 @@ import {
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [currentRoom, setCurrentRoom] = useState<StudyRoom | null>(null);
-  const [rooms, setRooms] = useState<StudyRoom[]>([]);
+const [rooms, setRooms] = useState<StudyRoom[]>([]);
+  const [myRooms, setMyRooms] = useState<StudyRoom[]>([]);
   const [newRoomName, setNewRoomName] = useState('');
   const [loading, setLoading] = useState(true);
 const [activeTab, setActiveTab] = useState<'explore' | 'create'>('explore');
@@ -56,7 +58,9 @@ const [activeTab, setActiveTab] = useState<'explore' | 'create'>('explore');
   const [roomError, setRoomError] = useState('');
   const [roomTab, setRoomTab] = useState<RoomTab>('whiteboard');
 
-  useEffect(() => {
+useEffect(() => {
+    let unsubscribeMyRooms: (() => void) | null = null;
+
     const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
       if (firebaseUser) {
         setUser({
@@ -65,8 +69,16 @@ const [activeTab, setActiveTab] = useState<'explore' | 'create'>('explore');
           email: firebaseUser.email || '',
           photoURL: firebaseUser.photoURL || undefined
         });
+
+        if (unsubscribeMyRooms) unsubscribeMyRooms();
+        unsubscribeMyRooms = subscribeToRoomsByHost(firebaseUser.uid, setMyRooms);
       } else {
         setUser(null);
+        setMyRooms([]);
+        if (unsubscribeMyRooms) {
+          unsubscribeMyRooms();
+          unsubscribeMyRooms = null;
+        }
       }
       setLoading(false);
     });
@@ -79,7 +91,10 @@ const [activeTab, setActiveTab] = useState<'explore' | 'create'>('explore');
 
     fetchRooms().then(setRooms).catch(console.error);
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      if (unsubscribeMyRooms) unsubscribeMyRooms();
+    };
   }, []);
 
   useEffect(() => {
@@ -183,7 +198,8 @@ const openRoom = async (room: StudyRoom, tab: RoomTab = 'whiteboard') => {
         createdAt: Date.now(),
         membersCount: 1
       };
-      setRooms((prev) => [newRoom, ...prev]);
+setRooms((prev) => [newRoom, ...prev]);
+      setMyRooms((prev) => [newRoom, ...prev]);
       setNewRoomName('');
       await openRoom(newRoom, tab);
     } catch (err) {
@@ -259,29 +275,13 @@ const openRoom = async (room: StudyRoom, tab: RoomTab = 'whiteboard') => {
     );
   }
 
-  if (showLeaderboard && user) {
+if (showLeaderboard && user) {
     return (
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.12),_transparent_30%),linear-gradient(135deg,_#020617,_#0f172a_44%,_#111827)] p-4 text-slate-100 sm:p-6 lg:p-8">
-        <div className="mx-auto max-w-4xl rounded-[32px] border border-white/10 bg-slate-900/75 p-6 shadow-2xl shadow-black/20 backdrop-blur-xl">
-          <button
-            type="button"
-            onClick={() => setShowLeaderboard(false)}
-            className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-2 text-sm text-slate-300 transition hover:text-white"
-          >
-            ← Back to study hub
-          </button>
-          <div className="mt-6 rounded-[24px] border border-white/10 bg-slate-950/60 p-5">
-            <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.25em] text-indigo-300">
-              <Trophy size={16} /> Leaderboard
-            </div>
-            <div className="mt-4 space-y-3 text-sm text-slate-300">
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-3">1. Maya — 12 focus streaks</div>
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-3">2. Liam — 10 focus streaks</div>
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-3">3. You — 8 focus streaks</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Leaderboard
+        currentUserId={user.uid}
+        currentUserName={user.displayName}
+        onBack={() => setShowLeaderboard(false)}
+      />
     );
   }
 
@@ -303,9 +303,10 @@ if (showExploreRooms) {
 
   if (showStudyHub && user) {
     return (
-      <StudyHubDashboard
+<StudyHubDashboard
         user={user}
         rooms={rooms}
+        myRooms={myRooms}
         roomError={roomError}
         onClearRoomError={() => setRoomError('')}
         onSelectRoom={(room) => {

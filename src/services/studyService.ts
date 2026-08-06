@@ -4,6 +4,7 @@ import {
   getDocs, 
   orderBy, 
   query, 
+  where, 
   onSnapshot, 
   serverTimestamp 
 } from 'firebase/firestore';
@@ -23,6 +24,20 @@ export const createRoom = async (roomName: string, hostId: string): Promise<stri
 export const fetchRooms = async (): Promise<StudyRoom[]> => {
   const querySnapshot = await getDocs(collection(db, 'rooms'));
   return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as StudyRoom));
+};
+
+export const fetchRoomsByHost = async (hostId: string): Promise<StudyRoom[]> => {
+  const q = query(collection(db, 'rooms'), where('hostId', '==', hostId));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as StudyRoom));
+};
+
+export const subscribeToRoomsByHost = (hostId: string, callback: (rooms: StudyRoom[]) => void) => {
+  const q = query(collection(db, 'rooms'), where('hostId', '==', hostId));
+  return onSnapshot(q, (snapshot) => {
+    const rooms = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as StudyRoom));
+    callback(rooms);
+  });
 };
 
 export const sendMessage = async (roomId: string, userId: string, userName: string, text: string) => {

@@ -5,6 +5,7 @@ import type { StudyRoom, User } from '../types';
 interface StudyHubDashboardProps {
   user: User;
   rooms: StudyRoom[];
+  myRooms: StudyRoom[];
   roomError?: string;
   onClearRoomError?: () => void;
   onSelectRoom: (room: StudyRoom) => void;
@@ -16,7 +17,7 @@ interface StudyHubDashboardProps {
   onSignOut: () => void;
 }
 
-export default function StudyHubDashboard({ user, rooms, roomError, onClearRoomError, onSelectRoom, onCreateRoom, onOpenTool, onOpenProfile, onOpenConversations, onOpenLeaderboard, onSignOut }: StudyHubDashboardProps) {
+export default function StudyHubDashboard({ user, rooms: _rooms, myRooms, roomError, onClearRoomError, onSelectRoom, onCreateRoom, onOpenTool, onOpenProfile, onOpenConversations, onOpenLeaderboard, onSignOut }: StudyHubDashboardProps) {
   const initials = user.displayName
     .split(' ')
     .map((part) => part[0])
@@ -107,8 +108,8 @@ export default function StudyHubDashboard({ user, rooms, roomError, onClearRoomE
               <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.25em] text-indigo-300">
                 <DoorOpen size={16} /> Your rooms
               </div>
-              <div className="mt-4 space-y-3">
-                {rooms.length > 0 ? rooms.slice(0, 4).map((room) => (
+<div className="mt-4 space-y-3">
+                {myRooms.length > 0 ? myRooms.slice(0, 4).map((room) => (
                   <div key={room.id} className={`flex items-center justify-between rounded-2xl border p-3 ${isDark ? 'border-slate-800 bg-slate-900/80' : 'border-slate-200 bg-white/90'}`}>
                     <div>
                       <div className={`text-sm font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>{room.name}</div>

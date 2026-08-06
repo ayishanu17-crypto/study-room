@@ -4,6 +4,7 @@ import type { StudyRoom, User } from '../types';
 interface ProfileDashboardProps {
   user: User;
   rooms: StudyRoom[];
+  myRooms?: StudyRoom[];
   onSelectRoom: (room: StudyRoom) => void;
 }
 
@@ -14,7 +15,8 @@ const sectionIcons = [
   { key: 'rooms', icon: DoorOpen, label: 'Rooms' }
 ] as const;
 
-export default function ProfileDashboard({ user, rooms, onSelectRoom }: ProfileDashboardProps) {
+export default function ProfileDashboard({ user, rooms, myRooms, onSelectRoom }: ProfileDashboardProps) {
+  const displayRooms = myRooms ?? rooms;
   const initials = user.displayName
     .split(' ')
     .map((part) => part[0])
@@ -139,8 +141,8 @@ export default function ProfileDashboard({ user, rooms, onSelectRoom }: ProfileD
                 <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.25em] text-indigo-300">
                   <DoorOpen size={16} /> Your rooms
                 </div>
-                <div className="mt-4 space-y-3">
-                  {rooms.length > 0 ? rooms.slice(0, 4).map((room) => (
+<div className="mt-4 space-y-3">
+                  {displayRooms.length > 0 ? displayRooms.slice(0, 4).map((room) => (
                     <div key={room.id} className="flex items-center justify-between rounded-2xl border border-slate-800 bg-slate-900/80 p-3">
                       <div>
                         <div className="text-sm font-semibold text-white">{room.name}</div>

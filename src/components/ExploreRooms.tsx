@@ -31,7 +31,6 @@ const demoRooms: StudyRoom[] = [
 ];
 
 export default function ExploreRooms({ user, rooms, onSelectRoom, onBack, onSignIn }: ExploreRoomsProps) {
-  const isDark = true;
   const shellClass = 'bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.14),_transparent_30%),linear-gradient(135deg,_#020617,_#0f172a_44%,_#111827)] text-slate-100';
   const cardClass = 'border-white/10 bg-slate-900/75 shadow-black/20';
 
