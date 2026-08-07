@@ -28,9 +28,8 @@ export default function Leaderboard({ currentUserId, currentUserName, onBack }: 
     { userId: 'top-8', userName: 'Diego Torres', score: 430, streaks: 3 }
   ];
 
-  const sorted = [...entries].sort((a, b) => b.score - a.score);
+const sorted = [...entries].sort((a, b) => b.score - a.score);
   const topThree = sorted.slice(0, 3);
-  const rest = sorted.slice(3);
   // Podium order: 2nd, 1st, 3rd (left to right)
   const podiumOrder = [topThree[1], topThree[0], topThree[2]];
 

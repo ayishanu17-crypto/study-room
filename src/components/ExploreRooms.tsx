@@ -6,7 +6,7 @@ interface ExploreRoomsProps {
   rooms: StudyRoom[];
   onSelectRoom: (room: StudyRoom) => void;
   onBack: () => void;
-  onSignIn: () => void;
+  onSignIn: (room: StudyRoom) => void;
 }
 
 // Free looping sample clips used as "live preview" placeholders for each room.
@@ -17,6 +17,16 @@ const sampleClips = [
   'https://assets.mixkit.co/videos/preview/mixkit-woman-reading-a-book-in-a-library-1200-large.mp4',
   'https://assets.mixkit.co/videos/preview/mixkit-open-book-with-a-magnifying-glass-4164-large.mp4',
   'https://assets.mixkit.co/videos/preview/mixkit-woman-studying-at-her-desk-4377-large.mp4'
+];
+
+// Room-themed image previews so each study room card shows a picture.
+const roomImages = [
+  'https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&w=800&q=80',
+  'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80'
 ];
 
 // Demo rooms shown when there are no real rooms in the database yet,
@@ -63,10 +73,11 @@ export default function ExploreRooms({ user, rooms, onSelectRoom, onBack, onSign
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {displayRooms.map((room, index) => {
             const clip = sampleClips[index % sampleClips.length];
+            const image = roomImages[index % roomImages.length];
             const isSignedIn = Boolean(user);
             return (
               <div key={room.id} className={`flex flex-col overflow-hidden rounded-[24px] border transition hover:border-indigo-500/40 ${cardClass}`}>
-                {/* Video preview */}
+                {/* Video + image preview */}
                 <div className="relative aspect-video overflow-hidden bg-slate-950">
                   <video
                     src={clip}
@@ -74,8 +85,14 @@ export default function ExploreRooms({ user, rooms, onSelectRoom, onBack, onSign
                     muted
                     loop
                     playsInline
-                    className="h-full w-full object-cover"
+                    className="absolute inset-0 h-full w-full object-cover"
                   />
+                  <img
+                    src={image}
+                    alt={room.name}
+                    className="absolute inset-0 h-full w-full object-cover opacity-40"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
                   <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-500/10 px-2.5 py-1 text-[10px] font-semibold text-emerald-300 backdrop-blur">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" /> Live
                   </div>
@@ -95,7 +112,7 @@ export default function ExploreRooms({ user, rooms, onSelectRoom, onBack, onSign
                       if (isSignedIn) {
                         onSelectRoom(room);
                       } else {
-                        onSignIn();
+                        onSignIn(room);
                       }
                     }}
                     className="mt-1 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-indigo-500"

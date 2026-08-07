@@ -1,8 +1,9 @@
-# Task: Show user's rooms in "Your rooms" after sign-in and make room creation work
+# Task: Explore rooms improvements
 
 ## Steps
-- [x] 1. Add `fetchRoomsByHost(hostId)` and `subscribeToRoomsByHost(hostId, cb)` to `studyService.ts`
-- [x] 2. Update `App.tsx` to add `myRooms` state, load it on sign-in, and update on room creation
-- [x] 3. Update `StudyHubDashboard.tsx` to display `myRooms` in "Your rooms"
-- [x] 4. Update `ProfileDashboard.tsx` to display `myRooms` in "Your rooms"
-- [x] 5. Verify with build/dev server
+- [x] 1. Analyze current ExploreRooms flow and "See others live" button
+- [x] 2. Make "See others live" button open the Explore Rooms page
+- [x] 3. Add image previews to room cards in ExploreRooms
+- [x] 4. Add `pendingRoom` state so "Sign in to join" opens that room after sign-in
+- [x] 5. Update `ExploreRooms` `onSignIn` to pass the clicked room
+- [x] 6. Verify with build

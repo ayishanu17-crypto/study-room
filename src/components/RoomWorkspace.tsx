@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import type { ChatMessage, StudyRoom, User } from '../types';
 import { sendMessage, subscribeToMessages } from '../services/studyService';
-import { ArrowLeft, Video, VideoOff, Mic, MicOff, MessageSquare, Edit3, Clock, Brain, Users, Sparkles, CheckCircle2 } from 'lucide-react';
+import Whiteboard from './Whiteboard';
+import { ArrowLeft, Video, VideoOff, Mic, MicOff, MessageSquare, Edit3, Clock, Brain, Users, CheckCircle2 } from 'lucide-react';
 
 interface RoomWorkspaceProps {
   room: StudyRoom;
@@ -218,15 +219,9 @@ export default function RoomWorkspace({ room, user, onLeave, initialTab = 'white
         
         {/* Left Workspace Panel */}
         <main className={`flex-1 p-6 flex flex-col overflow-y-auto ${isDark ? 'bg-slate-950/40' : 'bg-[#f8f9fc]'}`}>
-          {activeTab === 'whiteboard' && (
-            <div className={`flex-1 border rounded-3xl p-6 flex flex-col items-center justify-center relative shadow-sm ${panelClass}`}>
-              <div className={`absolute top-6 left-6 text-xs font-semibold flex items-center gap-2 ${mutedClass}`}>
-                <Sparkles size={14} className="text-indigo-600" /> Collaborative Canvas
-              </div>
-              <div className="text-center space-y-2">
-                <p className={`font-medium text-sm ${isDark ? 'text-slate-100' : 'text-slate-800'}`}>Interactive Whiteboard Ready</p>
-                <p className={`text-xs ${mutedClass}`}>Sketch diagrams, write structural logic, and brainstorm together.</p>
-              </div>
+{activeTab === 'whiteboard' && (
+            <div className="flex-1 min-h-0 overflow-hidden rounded-3xl border border-slate-800 shadow-sm">
+              <Whiteboard />
             </div>
           )}
 

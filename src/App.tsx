@@ -13,9 +13,10 @@ import {
 import { fetchRooms, createRoom, subscribeToRoomsByHost } from './services/studyService';
 import RoomWorkspace from './components/RoomWorkspace';
 import StudyHubDashboard from './components/StudyHubDashboard';
-import ProfileSettings from './components/ProfileSettings';
+import ProfileDashboard from './components/ProfileDashboard';
 import ExploreRooms from './components/ExploreRooms';
 import Leaderboard from './components/Leaderboard';
+import Conversations from './components/Conversations';
 import {
   LogIn,
   LogOut,
@@ -31,8 +32,7 @@ import {
   PenTool,
   Trophy,
   ShieldCheck,
-  UserRound,
-  MessageSquare
+  UserRound
 } from 'lucide-react';
 
 export default function App() {
@@ -50,6 +50,7 @@ const [activeTab, setActiveTab] = useState<'explore' | 'create'>('explore');
   const [showConversations, setShowConversations] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
+  const [pendingRoom, setPendingRoom] = useState<StudyRoom | null>(null);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const [authEmail, setAuthEmail] = useState('');
   const [authPassword, setAuthPassword] = useState('');
@@ -97,29 +98,41 @@ useEffect(() => {
     };
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
     if (user) {
-      setShowStudyHub(true);
-      setShowProfileSettings(false);
-      setShowConversations(false);
-      setShowLeaderboard(false);
+      if (pendingRoom) {
+        const room = pendingRoom;
+        setPendingRoom(null);
+        setCurrentRoom(room);
+        setRoomTab('whiteboard');
+        setShowStudyHub(false);
+        setShowExploreRooms(false);
+        setShowProfileSettings(false);
+        setShowConversations(false);
+        setShowLeaderboard(false);
+      } else {
+        setShowStudyHub(true);
+        setShowProfileSettings(false);
+        setShowConversations(false);
+        setShowLeaderboard(false);
+        setCurrentView('home');
+      }
       setShowAuth(false);
-      setCurrentView('home');
+      setShowExploreRooms(false);
     } else {
       setShowStudyHub(false);
       setShowProfileSettings(false);
       setShowConversations(false);
       setShowLeaderboard(false);
     }
-  }, [user]);
+  }, [user, pendingRoom]);
 
-  const handleGoogleLogin = async () => {
+const handleGoogleLogin = async () => {
     try {
       setAuthError('');
       setAuthLoading(true);
       await signInWithPopup(auth, googleProvider);
       setShowAuth(false);
-      setShowStudyHub(true);
     } catch (error) {
       console.error('Login failed:', error);
       setAuthError('Google sign-in failed. Please try again.');
@@ -140,11 +153,10 @@ useEffect(() => {
       setAuthLoading(true);
       if (authMode === 'signin') {
         await signInWithEmailAndPassword(auth, authEmail.trim(), authPassword);
-      } else {
+} else {
         await createUserWithEmailAndPassword(auth, authEmail.trim(), authPassword);
       }
       setShowAuth(false);
-      setShowStudyHub(true);
       setAuthEmail('');
       setAuthPassword('');
     } catch (error: unknown) {
@@ -238,8 +250,14 @@ setRooms((prev) => [newRoom, ...prev]);
 
   if (showProfileSettings && user) {
     return (
-      <ProfileSettings
+      <ProfileDashboard
         user={user}
+        rooms={rooms}
+        myRooms={myRooms}
+        onSelectRoom={(room) => {
+          void openRoom(room, 'whiteboard');
+        }}
+        onOpenConversations={() => setShowConversations(true)}
         onBack={() => setShowProfileSettings(false)}
         onSignOut={async () => {
           await handleLogout();
@@ -252,26 +270,11 @@ setRooms((prev) => [newRoom, ...prev]);
 
   if (showConversations && user) {
     return (
-      <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(99,102,241,0.12),_transparent_30%),linear-gradient(135deg,_#020617,_#0f172a_44%,_#111827)] p-4 text-slate-100 sm:p-6 lg:p-8">
-        <div className="mx-auto max-w-4xl rounded-[32px] border border-white/10 bg-slate-900/75 p-6 shadow-2xl shadow-black/20 backdrop-blur-xl">
-          <button
-            type="button"
-            onClick={() => setShowConversations(false)}
-            className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-2 text-sm text-slate-300 transition hover:text-white"
-          >
-            ← Back to study hub
-          </button>
-          <div className="mt-6 rounded-[24px] border border-white/10 bg-slate-950/60 p-5">
-            <div className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.25em] text-indigo-300">
-              <MessageSquare size={16} /> Conversations
-            </div>
-            <div className="mt-4 space-y-3 text-sm text-slate-300">
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-3">Physics group: We are meeting at 7 PM for a quick recap.</div>
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-3">Coding sprint: Reminder to bring questions for review.</div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Conversations
+        user={user}
+        rooms={myRooms.length > 0 ? myRooms : rooms}
+        onBack={() => setShowConversations(false)}
+      />
     );
   }
 
@@ -296,7 +299,10 @@ if (showExploreRooms) {
           }
         }}
         onBack={() => setShowExploreRooms(false)}
-        onSignIn={() => setShowAuth(true)}
+        onSignIn={(room) => {
+          setPendingRoom(room);
+          setShowAuth(true);
+        }}
       />
     );
   }
@@ -531,8 +537,8 @@ if (showExploreRooms) {
               Kvantum Room brings together live study circles, shared focus tools, and simple room-based collaboration so students can stay productive without noise or distraction.
             </p>
           </div>
-          <button
-            onClick={() => setShowAuth(true)}
+<button
+            onClick={() => setShowExploreRooms(true)}
             className="inline-flex items-center gap-2 rounded-2xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500"
           >
             <ArrowRight size={16} /> See others live
